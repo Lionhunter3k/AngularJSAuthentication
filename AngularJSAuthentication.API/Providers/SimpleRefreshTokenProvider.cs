@@ -30,7 +30,7 @@ namespace AngularJSAuthentication.API.Providers
                
                 var token = new RefreshToken() 
                 { 
-                    Id = Helper.GetHash(refreshTokenId),
+                    Id = HashExtensions.GetHash(refreshTokenId),
                     ClientId = clientid, 
                     Subject = context.Ticket.Identity.Name,
                     IssuedUtc = DateTime.UtcNow,
@@ -58,7 +58,7 @@ namespace AngularJSAuthentication.API.Providers
             var allowedOrigin = context.OwinContext.Get<string>("as:clientAllowedOrigin");
             context.OwinContext.Response.Headers.Add("Access-Control-Allow-Origin", new[] { allowedOrigin });
 
-            string hashedTokenId = Helper.GetHash(context.Token);
+            string hashedTokenId = HashExtensions.GetHash(context.Token);
 
             using (AuthRepository _repo = new AuthRepository())
             {

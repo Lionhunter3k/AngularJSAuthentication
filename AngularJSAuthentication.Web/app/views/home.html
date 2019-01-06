@@ -1,4 +1,4 @@
-﻿    <div class="row">
+﻿    <div class="row" ng-hide="authentication.isAuth">
         <div class="col-md-2">
             &nbsp;
         </div>
@@ -15,4 +15,21 @@
         <div class="col-md-2">
             &nbsp;
         </div>
+    </div>
+    <div class="row" ng-show="authentication.isAuth">
+        <table class="table">
+            <caption>External source</caption>
+            <thead>
+                <tr>
+                    <th>Claim Type</th>
+                    <th>Claim Value</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="row in externalSource">
+                    <td>{{row.type}}</td>
+                    <td>{{row.value}}</td>
+                </tr>
+            </tbody>
+        </table>
     </div>

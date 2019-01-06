@@ -2,7 +2,7 @@ namespace AngularJSAuthentication.API.Migrations
 {
     using System;
     using System.Data.Entity.Migrations;
-    
+
     public partial class AddClientsAndRefreshTokenTables : DbMigration
     {
         public override void Up()
@@ -20,7 +20,17 @@ namespace AngularJSAuthentication.API.Migrations
                         AllowedOrigin = c.String(maxLength: 100),
                     })
                 .PrimaryKey(t => t.Id);
-            
+
+            CreateTable(
+            "dbo.Audiences",
+                c => new
+                {
+                    Id = c.String(nullable: false, maxLength: 32),
+                    Base64Secret = c.String(nullable: false, maxLength: 80),
+                    Name = c.String(nullable: false, maxLength: 100),
+                })
+                .PrimaryKey(t => t.Id);
+
             CreateTable(
                 "dbo.RefreshTokens",
                 c => new
@@ -101,9 +111,9 @@ namespace AngularJSAuthentication.API.Migrations
                 .PrimaryKey(t => new { t.LoginProvider, t.ProviderKey, t.UserId })
                 .ForeignKey("dbo.AspNetUsers", t => t.UserId, cascadeDelete: true)
                 .Index(t => t.UserId);
-             
+
         }
-        
+
         public override void Down()
         {
             DropForeignKey("dbo.AspNetUserRoles", "UserId", "dbo.AspNetUsers");
@@ -122,6 +132,7 @@ namespace AngularJSAuthentication.API.Migrations
             DropTable("dbo.AspNetUserRoles");
             DropTable("dbo.AspNetRoles");
             DropTable("dbo.RefreshTokens");
+            DropTable("dbo.Audiences");
             DropTable("dbo.Clients");
         }
     }

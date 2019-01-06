@@ -27,8 +27,8 @@ namespace AngularJSAuthentication.API.Providers
 
             if (context.ClientId == null)
             {
-                //Remove the comments from the below line context.SetError, and invalidate context 
-                //if you want to force sending clientId/secrects once obtain access tokens. 
+                //Remove the comments from the below line context.SetError, and invalidate context
+                //if you want to force sending clientId/secrects once obtain access tokens.
                 context.Validated();
                 //context.SetError("invalid_clientId", "ClientId should be sent.");
                 return Task.FromResult<object>(null);
@@ -54,7 +54,7 @@ namespace AngularJSAuthentication.API.Providers
                 }
                 else
                 {
-                    if (client.Secret != Helper.GetHash(clientSecret))
+                    if (client.Secret != HashExtensions.GetHash(clientSecret))
                     {
                         context.SetError("invalid_clientId", "Client secret is invalid.");
                         return Task.FromResult<object>(null);
@@ -82,11 +82,21 @@ namespace AngularJSAuthentication.API.Providers
 
             if (allowedOrigin == null) allowedOrigin = "*";
 
+            var audience = context.OwinContext.Get<string>("for:audience");
+
+            if (audience == null)
+            {
+                using (AuthRepository repo = new AuthRepository())
+                {
+                    audience = repo.GetAllAudiences().FirstOrDefault()?.Id;
+                }
+            }
+
             context.OwinContext.Response.Headers.Add("Access-Control-Allow-Origin", new[] { allowedOrigin });
 
-            using (AuthRepository _repo = new AuthRepository())
+            using (AuthRepository repo = new AuthRepository())
             {
-                IdentityUser user = await _repo.FindUser(context.UserName, context.Password);
+                IdentityUser user = await repo.FindUser(context.UserName, context.Password);
 
                 if (user == null)
                 {
@@ -102,10 +112,13 @@ namespace AngularJSAuthentication.API.Providers
 
             var props = new AuthenticationProperties(new Dictionary<string, string>
                 {
-                    { 
-                        "as:client_id", (context.ClientId == null) ? string.Empty : context.ClientId
+                    {
+                        "as:client_id", context.ClientId ?? string.Empty
                     },
-                    { 
+                    {
+                        "audience", audience ?? string.Empty
+                    },
+                    {
                         "userName", context.UserName
                     }
                 });
@@ -128,7 +141,7 @@ namespace AngularJSAuthentication.API.Providers
 
             // Change auth ticket for refresh token requests
             var newIdentity = new ClaimsIdentity(context.Ticket.Identity);
-            
+
             var newClaim = newIdentity.Claims.Where(c => c.Type == "newClaim").FirstOrDefault();
             if (newClaim != null)
             {

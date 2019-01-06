@@ -37,7 +37,7 @@ app.controller('loginController', ['$scope', '$location', 'authService', 'ngAuth
 
         $scope.$apply(function () {
 
-            if (fragment.haslocalaccount == 'False') {
+            if (fragment.haslocalaccount === 'False') {
 
                 authService.logOut();
 

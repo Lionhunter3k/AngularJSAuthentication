@@ -1,4 +1,5 @@
-﻿using AngularJSAuthentication.API.Models;
+﻿using AngularJSAuthentication.API.App_Start;
+using AngularJSAuthentication.API.Models;
 using AngularJSAuthentication.API.Results;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
@@ -331,7 +332,7 @@ namespace AngularJSAuthentication.API.Controllers
                     parsedToken.user_id = jObj["data"]["user_id"];
                     parsedToken.app_id = jObj["data"]["app_id"];
 
-                    if (!string.Equals(Startup.facebookAuthOptions.AppId, parsedToken.app_id, StringComparison.OrdinalIgnoreCase))
+                    if (!string.Equals(AuthConfig.FacebookAuthOptions.AppId, parsedToken.app_id, StringComparison.OrdinalIgnoreCase))
                     {
                         return null;
                     }
@@ -341,7 +342,7 @@ namespace AngularJSAuthentication.API.Controllers
                     parsedToken.user_id = jObj["user_id"];
                     parsedToken.app_id = jObj["audience"];
 
-                    if (!string.Equals(Startup.googleAuthOptions.ClientId, parsedToken.app_id, StringComparison.OrdinalIgnoreCase))
+                    if (!string.Equals(AuthConfig.GoogleAuthOptions.ClientId, parsedToken.app_id, StringComparison.OrdinalIgnoreCase))
                     {
                         return null;
                     }
@@ -371,7 +372,7 @@ namespace AngularJSAuthentication.API.Controllers
 
             var ticket = new AuthenticationTicket(identity, props);
 
-            var accessToken = Startup.OAuthBearerOptions.AccessTokenFormat.Protect(ticket);
+            var accessToken = AuthConfig.OAuthBearerOptions.AccessTokenFormat.Protect(ticket);
 
             JObject tokenResponse = new JObject(
                                         new JProperty("userName", userName),

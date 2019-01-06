@@ -51,6 +51,11 @@ namespace AngularJSAuthentication.API
             return client;
         }
 
+        public Audience FindAudience(string audienceId)
+        {
+            return _ctx.Audiences.Find(audienceId);
+        }
+
         public async Task<bool> AddRefreshToken(RefreshToken token)
         {
 
@@ -60,7 +65,7 @@ namespace AngularJSAuthentication.API
            {
              var result = await RemoveRefreshToken(existingToken);
            }
-          
+
             _ctx.RefreshTokens.Add(token);
 
             return await _ctx.SaveChangesAsync() > 0;
@@ -94,6 +99,11 @@ namespace AngularJSAuthentication.API
         public List<RefreshToken> GetAllRefreshTokens()
         {
              return  _ctx.RefreshTokens.ToList();
+        }
+
+        public List<Audience> GetAllAudiences()
+        {
+            return _ctx.Audiences.ToList();
         }
 
         public async Task<IdentityUser> FindAsync(UserLoginInfo loginInfo)
