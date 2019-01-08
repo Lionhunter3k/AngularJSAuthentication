@@ -1,13 +1,15 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2013
-VisualStudioVersion = 12.0.30501.0
+# Visual Studio 15
+VisualStudioVersion = 15.0.28010.2046
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AngularJSAuthentication.API", "AngularJSAuthentication.API\AngularJSAuthentication.API.csproj", "{23DFCFD5-B158-4C0D-9C31-5E9CB64C64CF}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AngularJSAuthentication.Web", "AngularJSAuthentication.Web\AngularJSAuthentication.Web.csproj", "{E4156422-2684-4222-95C2-4B9AE4CBA7E3}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AngularJSAuthentication.ResourceServer", "AngularJSAuthentication.ResourceServer\AngularJSAuthentication.ResourceServer.csproj", "{69BC6280-CF91-409C-81BF-28B95417ACBF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "nH.Identity", "nH.Identity\nH.Identity.csproj", "{4F546AA8-644A-45E8-BCFC-2C6ABA65E54A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -27,8 +29,15 @@ Global
 		{69BC6280-CF91-409C-81BF-28B95417ACBF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{69BC6280-CF91-409C-81BF-28B95417ACBF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{69BC6280-CF91-409C-81BF-28B95417ACBF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4F546AA8-644A-45E8-BCFC-2C6ABA65E54A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4F546AA8-644A-45E8-BCFC-2C6ABA65E54A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4F546AA8-644A-45E8-BCFC-2C6ABA65E54A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4F546AA8-644A-45E8-BCFC-2C6ABA65E54A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {2605AD6C-92DC-4989-B16A-930E7D3E93A1}
 	EndGlobalSection
 EndGlobal
