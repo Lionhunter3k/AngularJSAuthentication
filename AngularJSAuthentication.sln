@@ -13,6 +13,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "nH.Identity", "nH.Identity\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AngularASPNETCore2WebApiAuth.Api", "AngularASPNETCore2WebApiAuth.Api\AngularASPNETCore2WebApiAuth.Api.csproj", "{D71BDAEB-13B0-4FC1-AB7D-843084F0A01B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TokenApi", "TokenApi\TokenApi.csproj", "{257E186C-9CC1-4857-BEAB-279A0D6E8433}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +41,10 @@ Global
 		{D71BDAEB-13B0-4FC1-AB7D-843084F0A01B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D71BDAEB-13B0-4FC1-AB7D-843084F0A01B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D71BDAEB-13B0-4FC1-AB7D-843084F0A01B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{257E186C-9CC1-4857-BEAB-279A0D6E8433}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{257E186C-9CC1-4857-BEAB-279A0D6E8433}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{257E186C-9CC1-4857-BEAB-279A0D6E8433}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{257E186C-9CC1-4857-BEAB-279A0D6E8433}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

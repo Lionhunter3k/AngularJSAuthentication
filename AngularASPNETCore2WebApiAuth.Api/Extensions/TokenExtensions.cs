@@ -12,7 +12,10 @@ namespace AngularASPNETCore2WebApiAuth.Api.Extensions
 {
     public static class TokenExtensions
     {
-        public static JsonSerializerSettings TokenSerializerSettings { get; set; }
+        public static JsonSerializerSettings TokenSerializerSettings { get; set; } = new JsonSerializerSettings
+        {
+            Formatting = Formatting.Indented
+        };
 
         public static async Task<IActionResult> GenerateJwt(this IJwtFactory jwtFactory, ClaimsIdentity identity, string userName, JwtIssuerOptions jwtOptions)
         {
