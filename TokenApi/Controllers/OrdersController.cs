@@ -15,12 +15,8 @@ namespace TokenApi.Extensions
         [Authorize]
         public IActionResult Get()
         {
-            //ClaimsPrincipal principal = Request.GetRequestContext().Principal as ClaimsPrincipal;
-
-            //var Name = ClaimsPrincipal.Current.Identity.Name;
-            //var Name1 = User.Identity.Name;
-
-            //var userName = principal.Claims.Where(c => c.Type == "sub").Single().Value;
+            //var userId = _caller.Claims.Single(c => c.Type == "id").Value;
+            //var userName = User.Claims.Where(c => c.Type == "sub").Single().Value;
 
             return Ok(Order.CreateOrders());
         }

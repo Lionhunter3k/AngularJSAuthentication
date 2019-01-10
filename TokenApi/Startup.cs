@@ -46,7 +46,7 @@ namespace TokenApi
             .RegisterClassMappingsFromAssemblyOf<UserMap>();
 
             // add identity
-            services.AddIdentity<User, Role>(o =>
+            services.AddIdentityCoreWithRole<User, Role>(o =>
             {
                 // configure identity options
                 o.Password.RequireDigit = false;

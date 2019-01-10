@@ -22,6 +22,7 @@ using System.Net;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Http;
 using AngularASPNETCore2WebApiAuth.Api.Mappings;
+using System.Threading.Tasks;
 
 namespace AngularASPNETCore2WebApiAuth.Api
 {
@@ -45,6 +46,21 @@ namespace AngularASPNETCore2WebApiAuth.Api
             services.AddSingleton<IJwtFactory, JwtFactory>();
 
             services.AddHttpContextAccessor();
+
+            // add identity (ORDER IS IMPORTANT AS FUCK)
+            //services.AddIdentityCoreWithRole<User, Role>(o =>
+            services.AddIdentityCore<User>(o =>
+            {
+                // configure identity options
+                o.Password.RequireDigit = false;
+                o.Password.RequireLowercase = false;
+                o.Password.RequireUppercase = false;
+                o.Password.RequireNonAlphanumeric = false;
+                o.Password.RequiredLength = 6;
+            })
+            .AddRoleToIdentity<Role>()
+            .RegisterSessionStores()
+            .AddDefaultTokenProviders();
 
             // jwt wire up
             // Get options from app settings
@@ -100,19 +116,6 @@ namespace AngularASPNETCore2WebApiAuth.Api
                         .Execute(true, false, false);
                     })
                     .RegisterClassMappingsFromAssemblyOf<UserMap>();
-
-            // add identity
-            services.AddIdentity<User, Role>(o =>
-            {
-                // configure identity options
-                o.Password.RequireDigit = false;
-                o.Password.RequireLowercase = false;
-                o.Password.RequireUppercase = false;
-                o.Password.RequireNonAlphanumeric = false;
-                o.Password.RequiredLength = 6;
-            })
-            .RegisterSessionStores()
-            .AddDefaultTokenProviders();
 
             services.AddAutoMapper();
 

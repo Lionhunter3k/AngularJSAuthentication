@@ -57,7 +57,7 @@ namespace TokenApi.Middleware
                 var signInManager = context.RequestServices.GetService<SignInManager<User>>();
                 var userManager = context.RequestServices.GetService<UserManager<User>>();
                 var user = await userManager.FindByEmailAsync(username);
-                var result = await signInManager.PasswordSignInAsync(user, password, false, lockoutOnFailure: false);
+                var result = await signInManager.CheckPasswordSignInAsync(user, password, false);
                 if (!result.Succeeded)
                 {
                     context.Response.StatusCode = 400;
