@@ -12,6 +12,16 @@ namespace AngularASPNETCore2WebApiAuth.Api.Extensions
 {
     public static class TokenExtensions
     {
+        public static class JwtClaimIdentifiers
+        {
+            public readonly static string Rol = "rol", Id = "id";
+        }
+
+        public static class JwtClaims
+        {
+            public readonly static string ApiAccess = "api_access";
+        }
+
         public static JsonSerializerSettings TokenSerializerSettings { get; set; } = new JsonSerializerSettings
         {
             Formatting = Formatting.Indented
