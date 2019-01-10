@@ -18,7 +18,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using System;
 using TokenApi.Middleware;
-using TokenApi.Mappings;
+using TokenApi.Entities.Mappings;
 
 namespace TokenApi
 {

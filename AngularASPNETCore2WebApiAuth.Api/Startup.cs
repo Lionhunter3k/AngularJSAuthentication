@@ -21,8 +21,8 @@ using System.IO;
 using System.Net;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Http;
-using AngularASPNETCore2WebApiAuth.Api.Mappings;
 using System.Threading.Tasks;
+using AngularASPNETCore2WebApiAuth.Api.ViewModels.Mappings;
 
 namespace AngularASPNETCore2WebApiAuth.Api
 {

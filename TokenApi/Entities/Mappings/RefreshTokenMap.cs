@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Text;
 using TokenApi.Entities;
 
-namespace TokenApi.Mappings
+namespace TokenApi.Entities.Mappings
 {
     public class RefreshTokenMap : ClassMapping<RefreshToken>
     {
