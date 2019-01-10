@@ -41,7 +41,7 @@ namespace AngularASPNETCore2WebApiAuth.Api.Auth
         /// <summary>
         /// Set the timespan the token will be valid for (default is 120 min)
         /// </summary>
-        public TimeSpan ValidFor { get; set; } = TimeSpan.FromMinutes(20);
+        public TimeSpan ValidFor { get; set; } = TimeSpan.FromMinutes(120);
 
 
 

@@ -18,6 +18,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using System;
 using TokenApi.Middleware;
+using TokenApi.Mappings;
 
 namespace TokenApi
 {
@@ -43,7 +44,8 @@ namespace TokenApi
                 .SetOutputFile(Path.Combine(Environment.ContentRootPath, "schema.sql"))
                 .Execute(true, false, false);
             })
-            .RegisterClassMappingsFromAssemblyOf<UserMap>();
+            .RegisterClassMappingsFromAssemblyOf<UserMap>()
+            .RegisterClassMappingsFromAssemblyOf<RefreshTokenMap>();
 
             // add identity
             services.AddIdentityCoreWithRole<User, Role>(o =>
@@ -147,6 +149,8 @@ namespace TokenApi
             app.UseCors("CorsPolicy");
 
             app.UseMiddleware<TokenProviderMiddleware>();
+
+            app.UseMiddleware<RefreshTokenProviderMiddleware>();
 
             app.UseAuthentication();
 

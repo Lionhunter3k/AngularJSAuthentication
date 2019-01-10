@@ -35,6 +35,12 @@ namespace TokenApi.Middleware
                 return _next(context);
             }
 
+            var grantType = context.Request.Form["grant_type"];
+            if(grantType != "password")
+            {
+                return _next(context);
+            }
+
             // Request must be POST with Content-Type: application/x-www-form-urlencoded
             if (!context.Request.Method.Equals("POST")
                || !context.Request.HasFormContentType)
@@ -71,7 +77,7 @@ namespace TokenApi.Middleware
                     return;
                 }
                 var getLokgToken = context.RequestServices.GetService<IJwtFactory>();
-                var response = getLokgToken.GenerateEncodedToken(user);
+                var response = await getLokgToken.GenerateEncodedTokenAsync(user, context.Request.Form["client_id"]);
 
                 // Serialize and return the response
                 context.Response.ContentType = "application/json";

@@ -28,7 +28,7 @@ namespace AngularASPNETCore2WebApiAuth.Api
 {
     public class Startup : StartupBase
     {
-        private const string SecretKey = "iNivDmHLpUA223sqsfhqGbMRdRj1PVkH"; // todo: get this from somewhere secure
+        private const string SecretKey = "IxrAjDoa2FqElO7IhrSrUJELhUckePEPVpaePlS_Xaw"; // todo: get this from somewhere secure
         private readonly SymmetricSecurityKey _signingKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(SecretKey));
 
         public Startup(IConfiguration configuration, IHostingEnvironment env)
