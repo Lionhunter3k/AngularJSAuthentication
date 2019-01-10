@@ -1,7 +1,7 @@
 ﻿'use strict';
-app.controller('homeController', ['$scope', 'authService', '$http', function ($scope, authService, $http) {
+app.controller('homeController', ['$scope', 'authService', '$http', 'externalResource', function ($scope, authService, $http, externalResource) {
     $scope.authentication = authService.authentication;
-    return $http.get('http://localhost:47039/api/protected').then(function (response) {
+    return $http.get(externalResource).then(function (response) {
         $scope.externalSource = response.data;
     });
 }]);

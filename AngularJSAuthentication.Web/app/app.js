@@ -41,13 +41,17 @@ app.config(function ($routeProvider) {
     $routeProvider.otherwise({ redirectTo: "/home" });
 
 });
-
-var serviceBase = 'http://localhost:26264/';
+var serviceBase = 'http://localhost:26214/';
+//var serviceBase = 'http://localhost:26264/';
 //var serviceBase = 'http://ngauthenticationapi.azurewebsites.net/';
 app.constant('ngAuthSettings', {
     apiServiceBaseUri: serviceBase,
     clientId: 'ngAuthApp'
 });
+
+//var externalResource = 'http://localhost:47039/';
+var externalResource = serviceBase;
+app.constant('externalResource', externalResource + 'api/protected');
 
 app.config(function ($httpProvider) {
     $httpProvider.interceptors.push('authInterceptorService');

@@ -94,7 +94,7 @@ namespace nH.Identity.Impl
         async Task<IdentityResult> IUserStore<User>.CreateAsync(User user, CancellationToken cancellationToken)
         {
             var addr = new MailAddress(user.Email);
-            user.Id = $"{addr.User.ToLowerInvariant()}_{Guid.NewGuid().ToString("n2").Substring(0, 6)}";
+            user.Id = $"{addr.User.ToLowerInvariant()}_{Guid.NewGuid().ToString("n").Substring(0, 6)}";
             await _session.SaveAsync(user, cancellationToken);
             return IdentityResult.Success;
         }
@@ -349,13 +349,11 @@ namespace nH.Identity.Impl
 
         Task IUserEmailStore<User>.SetNormalizedEmailAsync(User user, string normalizedEmail, CancellationToken cancellationToken)
         {
-            user.Email = normalizedEmail;
             return Task.FromResult<object>(null);
         }
 
         Task IUserStore<User>.SetNormalizedUserNameAsync(User user, string normalizedName, CancellationToken cancellationToken)
         {
-            user.DisplayName = normalizedName;
             return Task.FromResult<object>(null);
         }
 

@@ -24,14 +24,14 @@ namespace nH.Identity.Extensions
             {
                 throw new NotSupportedException("RoleType must be of nH.Identity.User, nH.Identity type");
             }
-            builder.Services.AddScoped(typeof(IUserStore<>), typeof(UserStore));
+            builder.Services.AddScoped(typeof(IUserStore<User>), typeof(UserStore));
             if (builder.RoleType != null)
             {
                 if(builder.RoleType != typeof(Role))
                 {
                     throw new NotSupportedException("RoleType must be of nH.Identity.Role, nH.Identity type");
                 }
-                builder.Services.AddScoped(typeof(IRoleStore<>), typeof(RoleStore));
+                builder.Services.AddScoped(typeof(IRoleStore<Role>), typeof(RoleStore));
             }
             return builder;
         }
@@ -44,12 +44,12 @@ namespace nH.Identity.Extensions
                                 select t);
             foreach (var mappingType in mappingTypes)
             {
-                services.TryAddEnumerable(ServiceDescriptor.Singleton(typeof(IConformistHoldersProvider), mappingType));
+                services.TryAddEnumerable(ServiceDescriptor.Transient(typeof(IConformistHoldersProvider), mappingType));
             }
             return services;
         }
 
-        public static IServiceCollection ConfigurePersistence<TDialect, TDriver>(this IServiceCollection services, string connectionStringName)
+        public static IServiceCollection ConfigurePersistence<TDialect, TDriver>(this IServiceCollection services, string connectionStringName, Action<Configuration> onConfigurationCreated = null)
             where TDialect : Dialect
             where TDriver : IDriver
         {
@@ -83,6 +83,7 @@ namespace nH.Identity.Extensions
                 var mapper = ctx.GetRequiredService<ModelMapper>();
                 var hbm = mapper.CompileMappingForAllExplicitlyAddedEntities();
                 nhConfig.AddMapping(hbm);
+                onConfigurationCreated?.Invoke(nhConfig);
                 return nhConfig;
             });
             services.AddSingleton((ctx) => ctx.GetRequiredService<Configuration>().BuildSessionFactory());

@@ -11,6 +11,7 @@ namespace nH.Identity.Mappings
     {
         public UserMap()
         {
+            Table("`User`");
             Id(x => x.Id, map => { map.Generator(Generators.Assigned); map.Length(50); });
             Property(x => x.PasswordHash, map => { map.NotNullable(true); map.Length(200); });
             Property(x => x.SecurityStamp, map => { map.NotNullable(true); map.Length(50); });
