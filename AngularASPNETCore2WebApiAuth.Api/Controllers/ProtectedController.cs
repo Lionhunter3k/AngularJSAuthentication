@@ -9,7 +9,7 @@ using System.Security.Claims;
 
 namespace AngularJSAuthentication.ResourceServer.Controllers
 {
-    [Authorize(Policy = "ApiUser")]
+    [Authorize(Policy = "Api_Access")]
     [Route("api/protected")]
     public class ProtectedController : ControllerBase
     {

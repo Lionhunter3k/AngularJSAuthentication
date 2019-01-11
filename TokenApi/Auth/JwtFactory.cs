@@ -62,6 +62,10 @@ namespace TokenApi.Auth
             foreach (var userRole in userRoles)
             {
                 claims.Add(new Claim(AuthExtensions.RoleClaimType, userRole.Name));
+                foreach(var roleClaim in userRole.RoleClaims)
+                {
+                    claims.Add(new Claim(roleClaim.ClaimType, roleClaim.ClaimValue));
+                }
             }
             string refreshTokenValue = null;
             if (!string.IsNullOrEmpty(refreshTokenType))

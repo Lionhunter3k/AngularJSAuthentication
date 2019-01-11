@@ -103,9 +103,18 @@ namespace AngularASPNETCore2WebApiAuth.Api.Auth
                  new Claim(JwtRegisteredClaimNames.Iat, ToUnixEpochDate(_jwtOptions.IssuedAt).ToString(), ClaimValueTypes.Integer64),
                  new Claim(TokenExtensions.JwtClaimIdentifiers.Id, user.Id)
              };
+            var userClaims = user.UserClaims;
+            foreach (var userClaim in userClaims)
+            {
+                claims.Add(new Claim(userClaim.ClaimType, userClaim.ClaimValue));
+            }
             foreach (var role in user.Roles)
             {
                 claims.Add(new Claim(TokenExtensions.JwtClaimIdentifiers.Rol, role.Name));
+                foreach(var roleClaim in role.RoleClaims)
+                {
+                    claims.Add(new Claim(roleClaim.ClaimType, roleClaim.ClaimValue));
+                }
             }
             return new ClaimsPrincipal(new List<ClaimsIdentity> { new ClaimsIdentity(new GenericIdentity(user.Email, JwtBearerDefaults.AuthenticationScheme), claims) });
         }

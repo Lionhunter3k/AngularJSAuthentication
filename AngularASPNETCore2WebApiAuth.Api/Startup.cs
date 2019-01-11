@@ -24,6 +24,7 @@ using Microsoft.AspNetCore.Http;
 using System.Threading.Tasks;
 using AngularASPNETCore2WebApiAuth.Api.ViewModels.Mappings;
 using AngularASPNETCore2WebApiAuth.Api.Entities.Mappings;
+using Microsoft.AspNetCore.Authorization;
 
 namespace AngularASPNETCore2WebApiAuth.Api
 {
@@ -104,10 +105,14 @@ namespace AngularASPNETCore2WebApiAuth.Api
             });
 
             // api user claim policy
-            services.AddAuthorization(options =>
-            {
-                options.AddPolicy("ApiUser", policy => policy.RequireClaim("rol", "API_ACCESS"));
-            });
+            //services.AddAuthorization(options =>
+            //{
+            //    options.AddPolicy("ApiUser", policy => policy.RequireClaim("rol", "API_ACCESS"));
+            //});
+
+            // register the scope authorization handler
+            services.AddScoped<IAuthorizationPolicyProvider, DynamicRolePolicyProvider>();
+            services.AddScoped<IAuthorizationHandler, HasRoleHandler>();
 
             // add persistence
             services.ConfigurePersistence<MsSql2012Dialect, SqlClientDriver>("SqlServer", cfg =>
