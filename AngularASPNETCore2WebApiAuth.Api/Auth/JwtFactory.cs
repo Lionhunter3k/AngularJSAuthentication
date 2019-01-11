@@ -1,55 +1,55 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Principal;
+using System.Text;
 using System.Threading.Tasks;
+using AngularASPNETCore2WebApiAuth.Api.Extensions;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Options;
-
+using Microsoft.IdentityModel.Tokens;
+using nH.Identity.Core;
 
 namespace AngularASPNETCore2WebApiAuth.Api.Auth
 {
     public class JwtFactory : IJwtFactory
     {
         private readonly JwtIssuerOptions _jwtOptions;
+        private readonly JwtSecurityTokenHandler _jwtSecurityTokenHandler;
+        private readonly TokenValidationParameters _tokenValidationParameters;
 
         public JwtFactory(IOptions<JwtIssuerOptions> jwtOptions)
         {
             _jwtOptions = jwtOptions.Value;
+            _jwtSecurityTokenHandler = new JwtSecurityTokenHandler();
+            _tokenValidationParameters = new TokenValidationParameters
+            {
+                ValidateAudience = true,
+                ValidAudience = _jwtOptions.Audience,
+                ValidateIssuer = true,
+                ValidIssuer = _jwtOptions.Issuer,
+                ValidateIssuerSigningKey = true,
+                IssuerSigningKey = _jwtOptions.SecurityKey,
+                ValidateLifetime = true // we check expired tokens here,
+            };
             ThrowIfInvalidOptions(_jwtOptions);
         }
 
-        public async Task<string> GenerateEncodedToken(string userName, ClaimsIdentity identity)
+        public Task<AccessToken> GenerateEncodedTokenAsync(ClaimsPrincipal user)
         {
-            var claims = new[]
-         {
-                 new Claim(JwtRegisteredClaimNames.Sub, userName),
-                 new Claim(JwtRegisteredClaimNames.Jti, await _jwtOptions.JtiGenerator()),
-                 new Claim(JwtRegisteredClaimNames.Iat, ToUnixEpochDate(_jwtOptions.IssuedAt).ToString(), ClaimValueTypes.Integer64),
-                 identity.FindFirst("rol"),
-                 identity.FindFirst("id")
-             };
-
             // Create the JWT security token and encode it.
             var jwt = new JwtSecurityToken(
                 issuer: _jwtOptions.Issuer,
                 audience: _jwtOptions.Audience,
-                claims: claims,
+                claims: user.Claims,
                 notBefore: _jwtOptions.NotBefore,
                 expires: _jwtOptions.Expiration,
                 signingCredentials: _jwtOptions.SigningCredentials);
 
-            var encodedJwt = new JwtSecurityTokenHandler().WriteToken(jwt);
+            var encodedJwt = _jwtSecurityTokenHandler.WriteToken(jwt);
 
-            return encodedJwt;
-        }
-
-        public ClaimsIdentity GenerateClaimsIdentity(string userName, string id)
-        {
-            return new ClaimsIdentity(new GenericIdentity(userName, "Token"), new[]
-            {
-                new Claim("id", id),
-                new Claim("rol", "api_access")
-            });
+            return Task.FromResult(new AccessToken(encodedJwt, (int)_jwtOptions.ValidFor.TotalSeconds));
         }
 
         /// <returns>Date converted to seconds since Unix epoch (Jan 1, 1970, midnight UTC).</returns>
@@ -76,6 +76,38 @@ namespace AngularASPNETCore2WebApiAuth.Api.Auth
             {
                 throw new ArgumentNullException(nameof(JwtIssuerOptions.JtiGenerator));
             }
+        }
+
+        public Task<ClaimsPrincipal> GetPrincipalFromTokenAsync(string token)
+        {
+            try
+            {
+                var principal = _jwtSecurityTokenHandler.ValidateToken(token, _tokenValidationParameters, out var securityToken);
+                if (!(securityToken is JwtSecurityToken jwtSecurityToken) || !jwtSecurityToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256, StringComparison.InvariantCultureIgnoreCase))
+                    return Task.FromResult<ClaimsPrincipal>(null);
+
+                return Task.FromResult(principal);
+            }
+            catch
+            {
+                return Task.FromResult<ClaimsPrincipal>(null);
+            }
+        }
+
+        public async Task<ClaimsPrincipal> GetPrincipalFromUserAsync(User user)
+        {
+            var claims = new List<Claim>
+            {
+                 new Claim(JwtRegisteredClaimNames.Sub, user.Email),
+                 new Claim(JwtRegisteredClaimNames.Jti, await _jwtOptions.JtiGenerator()),
+                 new Claim(JwtRegisteredClaimNames.Iat, ToUnixEpochDate(_jwtOptions.IssuedAt).ToString(), ClaimValueTypes.Integer64),
+                 new Claim(TokenExtensions.JwtClaimIdentifiers.Id, user.Id)
+             };
+            foreach (var role in user.Roles)
+            {
+                claims.Add(new Claim(TokenExtensions.JwtClaimIdentifiers.Rol, role.Name));
+            }
+            return new ClaimsPrincipal(new List<ClaimsIdentity> { new ClaimsIdentity(new GenericIdentity(user.Email, JwtBearerDefaults.AuthenticationScheme), claims) });
         }
     }
 }

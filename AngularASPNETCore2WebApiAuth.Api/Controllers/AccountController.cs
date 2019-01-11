@@ -41,7 +41,9 @@ namespace AngularASPNETCore2WebApiAuth.Api.Controllers
                 var userIdentity = _mapper.Map<User>(model);
 
                 var result = await _userManager.CreateAsync(userIdentity, model.Password);
-
+                if (!result.Succeeded)
+                    return new BadRequestObjectResult(ModelState.AddErrorsToModelState(result));
+                result = await _userManager.AddToRoleAsync(userIdentity, TokenExtensions.JwtClaims.ApiAccess);
                 if (!result.Succeeded)
                     return new BadRequestObjectResult(ModelState.AddErrorsToModelState(result));
                 await tx.CommitAsync();

@@ -23,14 +23,12 @@ using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Http;
 using System.Threading.Tasks;
 using AngularASPNETCore2WebApiAuth.Api.ViewModels.Mappings;
+using AngularASPNETCore2WebApiAuth.Api.Entities.Mappings;
 
 namespace AngularASPNETCore2WebApiAuth.Api
 {
     public class Startup : StartupBase
     {
-        private const string SecretKey = "IxrAjDoa2FqElO7IhrSrUJELhUckePEPVpaePlS_Xaw"; // todo: get this from somewhere secure
-        private readonly SymmetricSecurityKey _signingKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(SecretKey));
-
         public Startup(IConfiguration configuration, IHostingEnvironment env)
         {
             Configuration = configuration;
@@ -44,6 +42,8 @@ namespace AngularASPNETCore2WebApiAuth.Api
         public override void ConfigureServices(IServiceCollection services)
         {
             services.AddSingleton<IJwtFactory, JwtFactory>();
+
+            services.AddScoped<IRefreshTokenFactory, RefreshTokenFactory>();
 
             services.AddHttpContextAccessor();
 
@@ -66,10 +66,12 @@ namespace AngularASPNETCore2WebApiAuth.Api
             // Get options from app settings
             var jwtAppSettingOptions = Configuration.GetSection(nameof(JwtIssuerOptions));
             services.Configure<JwtIssuerOptions>(jwtAppSettingOptions);
+            var securityKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(jwtAppSettingOptions["SecretKey"]));
             // Configure JwtIssuerOptions
             services.PostConfigure<JwtIssuerOptions>(options =>
             {
-                options.SigningCredentials = new SigningCredentials(_signingKey, SecurityAlgorithms.HmacSha256);
+                options.SecurityKey = securityKey;
+                options.SigningCredentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
             });
 
             services.AddAuthentication(options =>
@@ -93,7 +95,7 @@ namespace AngularASPNETCore2WebApiAuth.Api
                     ValidAudience = jwtAppSettingOptions[nameof(JwtIssuerOptions.Audience)],
 
                     ValidateIssuerSigningKey = true,
-                    IssuerSigningKey = _signingKey,
+                    IssuerSigningKey = securityKey,
 
                     RequireExpirationTime = true,
                     ValidateLifetime = true,
@@ -104,7 +106,7 @@ namespace AngularASPNETCore2WebApiAuth.Api
             // api user claim policy
             services.AddAuthorization(options =>
             {
-                options.AddPolicy("ApiUser", policy => policy.RequireClaim("rol", "api_access"));
+                options.AddPolicy("ApiUser", policy => policy.RequireClaim("rol", "API_ACCESS"));
             });
 
             // add persistence
@@ -115,7 +117,8 @@ namespace AngularASPNETCore2WebApiAuth.Api
                         .SetOutputFile(Path.Combine(Environment.ContentRootPath, "schema.sql"))
                         .Execute(true, false, false);
                     })
-                    .RegisterClassMappingsFromAssemblyOf<UserMap>();
+                    .RegisterClassMappingsFromAssemblyOf<UserMap>()
+                    .RegisterClassMappingsFromAssemblyOf<RefreshTokenMap>();
 
             services.AddAutoMapper();
 

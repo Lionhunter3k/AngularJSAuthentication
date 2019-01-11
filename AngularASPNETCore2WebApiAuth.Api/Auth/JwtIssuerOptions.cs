@@ -55,5 +55,7 @@ namespace AngularASPNETCore2WebApiAuth.Api.Auth
         /// The signing key to use when generating tokens.
         /// </summary>
         public SigningCredentials SigningCredentials { get; set; }
+
+        public SymmetricSecurityKey SecurityKey { get; set; }
     }
 }
