@@ -115,7 +115,8 @@ namespace AngularASPNETCore2WebApiAuth.Api
             services.AddScoped<IAuthorizationHandler, HasRoleHandler>();
 
             // add persistence
-            services.ConfigurePersistence<MsSql2012Dialect, SqlClientDriver>("SqlServer", cfg =>
+            services.ConfigurePersistence<MySQL57Dialect, MySqlDataDriver>("MySql", cfg =>
+            //services.ConfigurePersistence<MsSql2012Dialect, SqlClientDriver>("SqlServer", cfg =>
                     {
                         var schemaExport = new SchemaExport(cfg);
                         schemaExport

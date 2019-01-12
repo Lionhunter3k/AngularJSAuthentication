@@ -11,7 +11,7 @@ namespace nH.Identity.Mappings
     {
         public RoleMap()
         {
-            Id(x => x.Id, map => { map.Generator(Generators.SequenceHiLo); });
+            Id(x => x.Id, map => { map.Generator(Generators.HighLow); });
             Property(x => x.Name, map => { map.NotNullable(true); map.Length(200); map.Unique(true); });
 
             Set(x => x.RoleClaims, colmap => { colmap.Key(x => x.Column("RoleId")); colmap.Inverse(true); colmap.Cascade(Cascade.All | Cascade.DeleteOrphans); }, map => { map.OneToMany(); });

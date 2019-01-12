@@ -11,7 +11,7 @@ namespace nH.Identity.Mappings
     {
         public RoleClaimMap()
         {
-            Id(x => x.Id, map => { map.Generator(Generators.SequenceHiLo); });
+            Id(x => x.Id, map => { map.Generator(Generators.HighLow); });
             Property(x => x.ClaimType, map => { map.NotNullable(true); map.Length(200); });
             Property(x => x.ClaimValue, map => { map.NotNullable(true); map.Length(200); });
             ManyToOne(x => x.Role, map =>
