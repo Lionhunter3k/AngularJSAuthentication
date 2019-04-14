@@ -41,7 +41,7 @@ app.config(function ($routeProvider) {
     $routeProvider.otherwise({ redirectTo: "/home" });
 
 });
-var serviceBase = 'http://localhost:26214/';
+var serviceBase = 'https://localhost:26214/';
 //var serviceBase = 'http://localhost:26264/';
 //var serviceBase = 'http://ngauthenticationapi.azurewebsites.net/';
 app.constant('ngAuthSettings', {

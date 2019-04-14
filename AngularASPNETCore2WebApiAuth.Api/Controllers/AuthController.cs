@@ -58,12 +58,12 @@ namespace AngularASPNETCore2WebApiAuth.Api.Controllers
             if(credentials.GrantType == "refresh_token")
             {
                 var token = await _refreshTokenFactory.RetrieveTokenAsync(credentials.RefreshToken, credentials.ClientId);
-                if(token != null)
+                if(token.HasValue)
                 {
-                    var cp = await _jwtFactory.GetPrincipalFromTokenAsync(token.Item2);
+                    var cp = await _jwtFactory.GetPrincipalFromTokenAsync(token.Value.Token);
                     if (cp != null)
                     {
-                        return await GenerateTokens(credentials.ClientId, token.Item1, cp);
+                        return await GenerateTokens(credentials.ClientId, token.Value.User, cp);
                     }
 
                 }

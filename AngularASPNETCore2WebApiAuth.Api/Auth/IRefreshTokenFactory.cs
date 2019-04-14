@@ -11,6 +11,6 @@ namespace AngularASPNETCore2WebApiAuth.Api.Auth
     {
         Task<string> GenerateTokenAsync(string accessToken, User user, string clientId);
 
-        Task<Tuple<User, string>> RetrieveTokenAsync(string token, string clientId);
+        Task<(User User, string Token)?> RetrieveTokenAsync(string token, string clientId);
     }
 }

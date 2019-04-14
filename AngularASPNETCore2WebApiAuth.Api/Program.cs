@@ -23,12 +23,12 @@ namespace AngularASPNETCore2WebApiAuth.Api
             .UseStartup<Startup>()
             .ConfigureAppConfiguration((hostingContext, config) =>
             {
-                config.AddJsonFile("appsettings.json").AddEnvironmentVariables();
+                config.AddJsonFile("appsettings.json").AddUserSecrets("aspnet-IdentityDemo-7939A8EF-89B2-46F3-9E64-E33629F164CB").AddEnvironmentVariables();
                 if (args == null)
                     return;
                 config.AddCommandLine(args);
             })
-            .UseUrls("http://localhost:26214")
+            .UseUrls("https://localhost:26214")
             .Build();
 
             using (var scope = host.Services.CreateScope())

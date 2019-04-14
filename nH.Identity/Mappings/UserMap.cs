@@ -13,7 +13,7 @@ namespace nH.Identity.Mappings
         {
             Table("`User`");
             Id(x => x.Id, map => { map.Generator(Generators.Assigned); map.Length(50); });
-            Property(x => x.PasswordHash, map => { map.NotNullable(true); map.Length(200); });
+            Property(x => x.PasswordHash, map => { map.NotNullable(false); map.Length(200); });
             Property(x => x.SecurityStamp, map => { map.NotNullable(true); map.Length(50); });
             Property(x => x.DisplayName, map => { map.Length(50); });
             Property(x => x.Email, map => { map.NotNullable(true); map.Length(50); });

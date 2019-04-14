@@ -25,6 +25,9 @@ using System.Threading.Tasks;
 using AngularASPNETCore2WebApiAuth.Api.ViewModels.Mappings;
 using AngularASPNETCore2WebApiAuth.Api.Entities.Mappings;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Authentication;
 
 namespace AngularASPNETCore2WebApiAuth.Api
 {
@@ -50,7 +53,7 @@ namespace AngularASPNETCore2WebApiAuth.Api
 
             // add identity (ORDER IS IMPORTANT AS FUCK)
             //services.AddIdentityCoreWithRole<User, Role>(o =>
-            services.AddIdentityCore<User>(o =>
+            services.AddIdentity<User, Role>(o =>
             {
                 // configure identity options
                 o.Password.RequireDigit = false;
@@ -59,7 +62,8 @@ namespace AngularASPNETCore2WebApiAuth.Api
                 o.Password.RequireNonAlphanumeric = false;
                 o.Password.RequiredLength = 6;
             })
-            .AddRoleToIdentity<Role>()
+            //.AddRoles<Role>()
+            //.AddSignInManager<SignInManager<User>>()
             .RegisterSessionStores()
             .AddDefaultTokenProviders();
 
@@ -79,8 +83,8 @@ namespace AngularASPNETCore2WebApiAuth.Api
             {
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
                 options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-
-            }).AddJwtBearer(configureOptions =>
+            })
+            .AddJwtBearer(configureOptions =>
             {
                 configureOptions.SaveToken = true;
 #if DEBUG
@@ -102,7 +106,26 @@ namespace AngularASPNETCore2WebApiAuth.Api
                     ValidateLifetime = true,
                     ClockSkew = TimeSpan.Zero
                 };
-            });
+            })
+             .AddFacebook(facebookOptions =>
+             {
+                 facebookOptions.AppId = Configuration["Authentication:Facebook:AppId"];
+                 facebookOptions.AppSecret = Configuration["Authentication:Facebook:AppSecret"];
+                 facebookOptions.Scope.Add("user_birthday");
+                 facebookOptions.Scope.Add("public_profile");
+                 facebookOptions.Fields.Add("birthday");
+                 facebookOptions.Fields.Add("picture");
+                 facebookOptions.Fields.Add("name");
+                 facebookOptions.Fields.Add("email");
+                 facebookOptions.Fields.Add("gender");
+                 facebookOptions.Events.OnCreatingTicket = (context) =>
+                 {
+                     context.Identity.AddClaim(new Claim("externalAccessToken", context.AccessToken));
+                     var identifier = context.Identity.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                     context.Identity.AddClaim(new Claim("image", $"https://graph.facebook.com/{identifier}/picture?type=large"));
+                     return Task.CompletedTask;
+                 };
+             }); ;
 
             // api user claim policy
             //services.AddAuthorization(options =>

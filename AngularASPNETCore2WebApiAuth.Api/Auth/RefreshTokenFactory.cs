@@ -33,14 +33,14 @@ namespace AngularASPNETCore2WebApiAuth.Api.Auth
             return refreshToken.Id.ToString("N");
         }
 
-        public async Task<Tuple<User, string>> RetrieveTokenAsync(string token, string clientId)
+        public async Task<(User User, string Token)?> RetrieveTokenAsync(string token, string clientId)
         {
             var guid = Guid.ParseExact(token, "N");
             var refreshToken = await _session.Query<RefreshToken>().SingleOrDefaultAsync(q => q.ClientId == clientId && q.Id == guid && q.ExpiresUtc >= DateTime.UtcNow);
             if (refreshToken == null)
                 return null;
             await _session.DeleteAsync(refreshToken);
-            return new Tuple<User, string>(refreshToken.User, refreshToken.Token);
+            return (refreshToken.User, refreshToken.Token);
         }
     }
 }
