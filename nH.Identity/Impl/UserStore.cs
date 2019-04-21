@@ -349,11 +349,13 @@ namespace nH.Identity.Impl
 
         Task IUserEmailStore<User>.SetNormalizedEmailAsync(User user, string normalizedEmail, CancellationToken cancellationToken)
         {
+            user.Email = normalizedEmail;
             return Task.FromResult<object>(null);
         }
 
         Task IUserStore<User>.SetNormalizedUserNameAsync(User user, string normalizedName, CancellationToken cancellationToken)
         {
+            user.DisplayName = normalizedName;
             return Task.FromResult<object>(null);
         }
 

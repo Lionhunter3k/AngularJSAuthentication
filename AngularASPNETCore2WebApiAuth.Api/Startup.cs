@@ -28,6 +28,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication;
+using nH.Infrastructure.Extensions;
 
 namespace AngularASPNETCore2WebApiAuth.Api
 {
@@ -138,16 +139,20 @@ namespace AngularASPNETCore2WebApiAuth.Api
             services.AddScoped<IAuthorizationHandler, HasRoleHandler>();
 
             // add persistence
-            services.ConfigurePersistence<MySQL57Dialect, MySqlDataDriver>("MySql", cfg =>
-            //services.ConfigurePersistence<MsSql2012Dialect, SqlClientDriver>("SqlServer", cfg =>
+            services.ConfigurePersistence()
+                    .UseDatabaseIntegration<SQLiteDialect, SQLite20Driver>("SQLite")
+                    //.UseDatabaseIntegration<MySQL57Dialect, MySqlDataDriver>("MySql")
+                    //.UseDatabaseIntegration<MsSql2012Dialect, SqlClientDriver>("SqlServer")
+                    .SetupConfiguration((_, cfg) =>
                     {
                         var schemaExport = new SchemaExport(cfg);
                         schemaExport
                         .SetOutputFile(Path.Combine(Environment.ContentRootPath, "schema.sql"))
-                        .Execute(true, false, false);
+                        .Execute(true, true, false);
                     })
-                    .RegisterClassMappingsFromAssemblyOf<UserMap>()
-                    .RegisterClassMappingsFromAssemblyOf<RefreshTokenMap>();
+                    .UseMappingsFromAssemblyOf<UserMap>()
+                    .UseMappingsFromAssemblyOf<RefreshTokenMap>()
+                    .UseDefaultModelMapper();
 
             services.AddAutoMapper();
 

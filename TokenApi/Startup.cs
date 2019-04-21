@@ -6,8 +6,6 @@ using nH.Identity.Mappings;
 using NHibernate.Dialect;
 using NHibernate.Driver;
 using nH.Identity.Extensions;
-using NHibernate.Tool.hbm2ddl;
-using System.IO;
 using nH.Identity.Core;
 using Microsoft.AspNetCore.Identity;
 using TokenApi.Extensions;
@@ -19,6 +17,8 @@ using System.Text;
 using System;
 using TokenApi.Middleware;
 using TokenApi.Entities.Mappings;
+using nH.Infrastructure.Extensions;
+using Authentication.Api.Infrastructure.Extensions;
 
 namespace TokenApi
 {
@@ -37,18 +37,14 @@ namespace TokenApi
         public override void ConfigureServices(IServiceCollection services)
         {
             // add persistence
-            services.ConfigurePersistence<MsSql2012Dialect, SqlClientDriver>("SqlServer", cfg =>
-            {
-                var schemaExport = new SchemaExport(cfg);
-                schemaExport
-                .SetOutputFile(Path.Combine(Environment.ContentRootPath, "schema.sql"))
-                .Execute(true, false, false);
-            })
-            .RegisterClassMappingsFromAssemblyOf<UserMap>()
-            .RegisterClassMappingsFromAssemblyOf<RefreshTokenMap>();
+            services.ConfigurePersistence()
+                .UseDatabaseIntegration<MsSql2012Dialect, SqlClientDriver>("SqlServer")
+                .UseDefaultModelMapper()
+                .UseMappingsFromAssemblyOf<UserMap>()
+                .UseMappingsFromAssemblyOf<RefreshTokenMap>();
 
             // add identity
-            services.AddIdentityCoreWithRole<User, Role>(o =>
+            services.AddIdentityCore<User, Role>(o =>
             {
                 // configure identity options
                 o.Password.RequireDigit = false;

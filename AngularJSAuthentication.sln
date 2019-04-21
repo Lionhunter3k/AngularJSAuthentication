@@ -9,11 +9,15 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AngularJSAuthentication.Web
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AngularJSAuthentication.ResourceServer", "AngularJSAuthentication.ResourceServer\AngularJSAuthentication.ResourceServer.csproj", "{69BC6280-CF91-409C-81BF-28B95417ACBF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "nH.Identity", "nH.Identity\nH.Identity.csproj", "{4F546AA8-644A-45E8-BCFC-2C6ABA65E54A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "nH.Identity", "nH.Identity\nH.Identity.csproj", "{4F546AA8-644A-45E8-BCFC-2C6ABA65E54A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AngularASPNETCore2WebApiAuth.Api", "AngularASPNETCore2WebApiAuth.Api\AngularASPNETCore2WebApiAuth.Api.csproj", "{D71BDAEB-13B0-4FC1-AB7D-843084F0A01B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AngularASPNETCore2WebApiAuth.Api", "AngularASPNETCore2WebApiAuth.Api\AngularASPNETCore2WebApiAuth.Api.csproj", "{D71BDAEB-13B0-4FC1-AB7D-843084F0A01B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TokenApi", "TokenApi\TokenApi.csproj", "{257E186C-9CC1-4857-BEAB-279A0D6E8433}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TokenApi", "TokenApi\TokenApi.csproj", "{257E186C-9CC1-4857-BEAB-279A0D6E8433}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "nH.Infrastructure", "nH.Infrastructure\nH.Infrastructure.csproj", "{40EA27DE-BA72-4295-93B6-99030F486CDB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Authentication.Api.Infrastructure", "Authentication.Api.Infrastructure\Authentication.Api.Infrastructure.csproj", "{5D0C09DF-83A7-429F-9207-FF5D5A2EB694}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -45,6 +49,14 @@ Global
 		{257E186C-9CC1-4857-BEAB-279A0D6E8433}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{257E186C-9CC1-4857-BEAB-279A0D6E8433}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{257E186C-9CC1-4857-BEAB-279A0D6E8433}.Release|Any CPU.Build.0 = Release|Any CPU
+		{40EA27DE-BA72-4295-93B6-99030F486CDB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{40EA27DE-BA72-4295-93B6-99030F486CDB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{40EA27DE-BA72-4295-93B6-99030F486CDB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{40EA27DE-BA72-4295-93B6-99030F486CDB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5D0C09DF-83A7-429F-9207-FF5D5A2EB694}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5D0C09DF-83A7-429F-9207-FF5D5A2EB694}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5D0C09DF-83A7-429F-9207-FF5D5A2EB694}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5D0C09DF-83A7-429F-9207-FF5D5A2EB694}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
