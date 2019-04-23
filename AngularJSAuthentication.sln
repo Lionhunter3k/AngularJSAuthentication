@@ -19,7 +19,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "nH.Infrastructure", "nH.Inf
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Authentication.Api.Infrastructure", "Authentication.Api.Infrastructure\Authentication.Api.Infrastructure.csproj", "{5D0C09DF-83A7-429F-9207-FF5D5A2EB694}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ASOS.Identity.Api", "ASOS.Identity.Api\ASOS.Identity.Api.csproj", "{606C9280-C7E9-4121-8BCF-6EAB4AC3B774}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ASOS.Identity.Api", "ASOS.Identity.Api\ASOS.Identity.Api.csproj", "{606C9280-C7E9-4121-8BCF-6EAB4AC3B774}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OAuthTutorial", "OAuthTutorial\OAuthTutorial.csproj", "{3A53917D-5745-4B44-9A88-03A76F8F7925}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -63,6 +65,10 @@ Global
 		{606C9280-C7E9-4121-8BCF-6EAB4AC3B774}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{606C9280-C7E9-4121-8BCF-6EAB4AC3B774}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{606C9280-C7E9-4121-8BCF-6EAB4AC3B774}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3A53917D-5745-4B44-9A88-03A76F8F7925}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3A53917D-5745-4B44-9A88-03A76F8F7925}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3A53917D-5745-4B44-9A88-03A76F8F7925}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3A53917D-5745-4B44-9A88-03A76F8F7925}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
