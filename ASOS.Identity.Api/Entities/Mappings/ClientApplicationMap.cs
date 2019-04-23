@@ -12,9 +12,8 @@ namespace ASOS.Identity.Api.Entities.Mappings
         public ClientApplicationMap()
         {
             Table("`ClientApplication`");
-            Id(x => x.Id, map => { map.Generator(Generators.HighLow); });
-            Property(x => x.Name, map => { map.NotNullable(true); map.Length(200); map.Unique(true); });
-            Property(x => x.Secret, map => { map.NotNullable(true); map.Length(200); });
+            Id(x => x.Id, map => { map.Generator(Generators.Assigned); });
+            Property(x => x.Secret, map => { map.Length(200); });
             Property(x => x.Type);
             List(x => x.AllowedGrants, c =>
             {
@@ -23,9 +22,24 @@ namespace ASOS.Identity.Api.Entities.Mappings
                     idx.Base(1);
                     idx.Column("GrantIndex");
                 });
+                c.Cascade(Cascade.All | Cascade.DeleteOrphans);
             }, r => r.Element(m =>
             {
                 m.Column("GrantType");
+                m.Length(100);
+                m.NotNullable(true);
+            }));
+            List(x => x.AllowedRedirectUris, c =>
+            {
+                c.Index(idx =>
+                {
+                    idx.Base(1);
+                    idx.Column("RedirectUriIndex");
+                });
+                c.Cascade(Cascade.All | Cascade.DeleteOrphans);
+            }, r => r.Element(m =>
+            {
+                m.Column("RedirectUri");
                 m.Length(100);
                 m.NotNullable(true);
             }));

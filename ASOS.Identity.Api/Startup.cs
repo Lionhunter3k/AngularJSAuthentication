@@ -1,12 +1,18 @@
-﻿using AspNet.Security.OpenIdConnect.Server;
+﻿using ASOS.Identity.Api.Entities.Mappings;
+using ASOS.Identity.Api.Providers;
+using ASOS.Identity.Api.Services;
+using AspNet.Security.OAuth.Validation;
+using AspNet.Security.OpenIdConnect.Server;
 using Authentication.Api.Infrastructure.Extensions;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Cors.Infrastructure;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using nH.Identity.Core;
 using nH.Identity.Extensions;
 using nH.Identity.Mappings;
@@ -15,6 +21,7 @@ using NHibernate.Dialect;
 using NHibernate.Driver;
 using NHibernate.Tool.hbm2ddl;
 using System.IO;
+using System.Threading.Tasks;
 
 namespace ASOS.Identity.Api
 {
@@ -44,6 +51,7 @@ namespace ASOS.Identity.Api
                 .UseDatabaseIntegration<SQLiteDialect, SQLite20Driver>("SQLite")
                 .UseDefaultModelMapper()
                 .UseMappingsFromAssemblyOf<UserMap>()
+                .UseMappingsFromAssemblyOf<ClientApplicationMap>()
                 .SetupConfiguration((_, cfg) =>
                  {
                      var schemaExport = new SchemaExport(cfg);
@@ -65,23 +73,50 @@ namespace ASOS.Identity.Api
             .RegisterSessionStores()
             .AddDefaultTokenProviders();
 
-            services.AddAuthentication()
+            services.AddAuthentication(options =>
+            {
+                options.DefaultScheme = OAuthValidationDefaults.AuthenticationScheme;
+            })
                .AddOpenIdConnectServer(options =>
                {
                     // Create your own authorization provider by subclassing
                     // the OpenIdConnectServerProvider base class.
-                    options.Provider = new OpenIdConnectServerProvider();
+                    options.Provider = new AuthorizationProvider();
                     // Enable the authorization and token endpoints.
                     options.AuthorizationEndpointPath = "/connect/authorize";
-                   options.TokenEndpointPath = "/connect/token";
+                    options.TokenEndpointPath = "/token";
                     // During development, you can set AllowInsecureHttp
                     // to true to disable the HTTPS requirement.
-                    options.AllowInsecureHttp = true;
+                    options.AllowInsecureHttp = HostingEnvironment.IsDevelopment();
 
                     // Note: uncomment this line to issue JWT tokens.
                     // options.AccessTokenHandler = new JwtSecurityTokenHandler();
+                }).AddOAuthValidation(options =>
+                {
+                    options.Audiences.Add("resource_server");
                 });
 
+
+            services.AddAuthorization(options =>
+            {
+                options.AddPolicy("Api_Access", policy => policy.RequireClaim("ASOS_Claim"));
+            });
+
+            services.AddCors(options =>
+            {
+                if (HostingEnvironment.IsDevelopment())
+                {
+                    options.AddDefaultPolicy(corsBuilder =>
+                    {
+                        corsBuilder.AllowAnyHeader()
+                        .AllowAnyMethod()
+                        .AllowAnyOrigin()
+                        .AllowCredentials();
+                    });
+                }
+            });
+            services.AddTransient<ICorsPolicyProvider, ClientApplicationCorsPolicyProvider>();
+            services.AddScoped<IClientApplicationStore, ClientApplicationStore>();
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
         }
 
@@ -102,6 +137,7 @@ namespace ASOS.Identity.Api
             app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseCookiePolicy();
+            app.UseCors();
             app.UseAuthentication();
             app.UseMvc(routes =>
             {
