@@ -55,7 +55,7 @@ var externalResource = serviceBase;
 app.constant('externalResource', externalResource + 'api/protected');
 
 app.config(function ($httpProvider) {
-    $httpProvider.interceptors.push('authInterceptorService');
+	$httpProvider.interceptors.push('authInterceptorService');
 });
 
 app.run(['authService', function (authService) {

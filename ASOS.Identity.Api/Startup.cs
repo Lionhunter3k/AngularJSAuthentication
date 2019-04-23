@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Primitives;
 using nH.Identity.Core;
 using nH.Identity.Extensions;
 using nH.Identity.Mappings;
@@ -20,6 +21,7 @@ using nH.Infrastructure.Extensions;
 using NHibernate.Dialect;
 using NHibernate.Driver;
 using NHibernate.Tool.hbm2ddl;
+using System;
 using System.IO;
 using System.Threading.Tasks;
 
@@ -137,6 +139,18 @@ namespace ASOS.Identity.Api
             app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseCookiePolicy();
+            app.Use(async (context, next) =>
+            {
+                if (context.Request.Query.TryGetValue("bearer", out var urlBearer))
+                {
+                    context.Request.Headers.Add("Authorization", "Bearer " + urlBearer);
+                }
+                else if(context.Request.Cookies.TryGetValue("bearer", out var cookieBearer))
+                {
+                    context.Request.Headers.Add("Authorization", "Bearer " + cookieBearer);
+                }
+                await next();
+            });
             app.UseCors();
             app.UseAuthentication();
             app.UseMvc(routes =>

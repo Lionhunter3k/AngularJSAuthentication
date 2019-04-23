@@ -19,7 +19,7 @@ namespace ASOS.Identity.Api.Migrations
                 var user = new User { DisplayName = "lionhunter", Email = "lionhunter@mail.com", PhoneNumber = "31231231" };
                 await userManager.CreateAsync(user, "user123456");
                 await userManager.AddClaimAsync(user, new System.Security.Claims.Claim("ASOS_Claim", "I like pie"));
-                await session.SaveAsync(new ClientApplication { AllowedGrants = new List<string> { "password", "authorization_code" }, AllowedRedirectUris = new List<string> { "https://localhost:44324" }, Id = "ngAuthApp", Type = ApplicationType.Public });
+                await session.SaveAsync(new ClientApplication { AllowedGrants = new List<string> { "password", "authorization_code" }, AllowedRedirectUris = new List<string> { "https://localhost:44324", "http://localhost:32150" }, Id = "ngAuthApp", Type = ApplicationType.Public });
                 await tx.CommitAsync();
             }
         }

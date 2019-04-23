@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Primitives;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,36 +22,17 @@ namespace ASOS.Identity.Api.Services
         public async Task<CorsPolicy> GetPolicyAsync(HttpContext context, string policyName)
         {
             var clientApplicationStore = context.RequestServices.GetRequiredService<IClientApplicationStore>();
-            if (context.Request.Query.TryGetValue("client_id", out var clientId))
+            var allowedRedirectUris = await clientApplicationStore.GetAllAllowedRedirectUrisAsync();
+            var defaultPolicy = _options.GetPolicy(policyName ?? _options.DefaultPolicyName);
+            var builder = new CorsPolicyBuilder(defaultPolicy);
+            if (!defaultPolicy.AllowAnyOrigin)
             {
-                var clientApplication = await clientApplicationStore.GetClientApplicationAsync(clientId);
-                if(clientApplication != null)
-                {
-                    return new CorsPolicyBuilder(clientApplication.AllowedRedirectUris.Select(r => new Uri(r).GetLeftPart(UriPartial.Authority)).ToArray())
-                        .AllowAnyHeader()
-                        .AllowAnyMethod()
-                        .AllowCredentials()
-                        .Build();
-                }
+                builder = builder.WithOrigins(allowedRedirectUris.Select(r => new Uri(r).GetLeftPart(UriPartial.Authority)).ToArray());
             }
-            if(context.Request.HasFormContentType)
-            {
-                context.Request.EnableBuffering();
-                var formData = await context.Request.ReadFormAsync();
-                if(formData.TryGetValue("client_id", out clientId))
-                {
-                    var clientApplication = await clientApplicationStore.GetClientApplicationAsync(clientId);
-                    if (clientApplication != null)
-                    {
-                        return new CorsPolicyBuilder(clientApplication.AllowedRedirectUris.Select(r => new Uri(r).GetLeftPart(UriPartial.Authority)).ToArray())
-                            .AllowAnyHeader()
-                            .AllowAnyMethod()
-                            .AllowCredentials()
-                            .Build();
-                    }
-                }
-            }
-            return _options.GetPolicy(policyName ?? _options.DefaultPolicyName);
+            return builder.AllowAnyHeader()
+                     .AllowAnyMethod()
+                     .AllowCredentials()
+                     .Build();
         }
     }
 }

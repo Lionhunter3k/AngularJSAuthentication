@@ -56,7 +56,7 @@ namespace ASOS.Identity.Api.Providers
             }
             // Note: the comparison doesn't need to be time-constant as the
             // callback URL stored in the database is not a secret value.
-            if (!application.AllowedRedirectUris.Any(redirectUri => string.Equals(context.RedirectUri, redirectUri, StringComparison.Ordinal)))
+            if (!application.AllowedRedirectUris.Any(redirectUri => redirectUri.StartsWith(context.RedirectUri, StringComparison.Ordinal)))
             {
                 context.Reject(
                     error: OpenIdConnectConstants.Errors.InvalidClient,
@@ -231,6 +231,12 @@ namespace ASOS.Identity.Api.Providers
                 ticket.SetResources("resource_server");
                 context.Validate(ticket);
             }
+        }
+
+        public override Task ApplyTokenResponse(ApplyTokenResponseContext context)
+        {
+            context.HttpContext.Response.Cookies.Append("bearer", context.Response.AccessToken);
+            return Task.CompletedTask;
         }
 
         public override Task MatchEndpoint(MatchEndpointContext context)
