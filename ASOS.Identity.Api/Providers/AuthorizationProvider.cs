@@ -147,12 +147,13 @@ namespace ASOS.Identity.Api.Providers
         public override async Task HandleTokenRequest(HandleTokenRequestContext context)
         {
             // Resolve ASP.NET Core Identity's user manager from the DI container.
-            var manager = context.HttpContext.RequestServices.GetRequiredService<SignInManager<User>>();
+            var signInManager = context.HttpContext.RequestServices.GetRequiredService<SignInManager<User>>();
+            var userManager = signInManager.UserManager;
             // Only handle grant_type=password requests and let ASOS
             // process grant_type=refresh_token requests automatically.
             if (context.Request.IsPasswordGrantType())
             {
-                var user = await manager.UserManager.FindByEmailAsync(context.Request.Username);
+                var user = await userManager.FindByEmailAsync(context.Request.Username);
                 if (user == null)
                 {
                     context.Reject(
@@ -161,7 +162,7 @@ namespace ASOS.Identity.Api.Providers
                     return;
                 }
                 // Ensure the user is allowed to sign in.
-                if (!await manager.CanSignInAsync(user))
+                if (!await signInManager.CanSignInAsync(user))
                 {
                     context.Reject(
                         error: OpenIdConnectConstants.Errors.InvalidGrant,
@@ -169,7 +170,7 @@ namespace ASOS.Identity.Api.Providers
                     return;
                 }
                 // Reject the token request if two-factor authentication has been enabled by the user.
-                if (manager.UserManager.SupportsUserTwoFactor && await manager.UserManager.GetTwoFactorEnabledAsync(user))
+                if (userManager.SupportsUserTwoFactor && await userManager.GetTwoFactorEnabledAsync(user))
                 {
                     context.Reject(
                         error: OpenIdConnectConstants.Errors.InvalidGrant,
@@ -177,7 +178,7 @@ namespace ASOS.Identity.Api.Providers
                     return;
                 }
                 // Ensure the user is not already locked out.
-                if (manager.UserManager.SupportsUserLockout && await manager.UserManager.IsLockedOutAsync(user))
+                if (userManager.SupportsUserLockout && await userManager.IsLockedOutAsync(user))
                 {
                     context.Reject(
                         error: OpenIdConnectConstants.Errors.InvalidGrant,
@@ -185,29 +186,29 @@ namespace ASOS.Identity.Api.Providers
                     return;
                 }
                 // Ensure the password is valid.
-                if (!await manager.UserManager.CheckPasswordAsync(user, context.Request.Password))
+                if (!await userManager.CheckPasswordAsync(user, context.Request.Password))
                 {
-                    if (manager.UserManager.SupportsUserLockout)
+                    if (userManager.SupportsUserLockout)
                     {
-                        await manager.UserManager.AccessFailedAsync(user);
+                        await userManager.AccessFailedAsync(user);
                     }
                     context.Reject(
                         error: OpenIdConnectConstants.Errors.InvalidGrant,
                         description: "Invalid credentials.");
                     return;
                 }
-                if (manager.UserManager.SupportsUserLockout)
+                if (userManager.SupportsUserLockout)
                 {
-                    await manager.UserManager.ResetAccessFailedCountAsync(user);
+                    await userManager.ResetAccessFailedCountAsync(user);
                 }
-                var claims = await manager.CreateUserPrincipalAsync(user);
+                var claims = await signInManager.CreateUserPrincipalAsync(user);
                 var ouathIdentity = new ClaimsIdentity(OpenIdConnectServerDefaults.AuthenticationScheme);
                 // Note: the subject claim is always included in both identity and
                 // access tokens, even if an explicit destination is not specified.
-                ouathIdentity.AddClaim(OpenIdConnectConstants.Claims.Subject, manager.UserManager.GetUserId(claims));
+                ouathIdentity.AddClaim(OpenIdConnectConstants.Claims.Subject, userManager.GetUserId(claims));
                 // When adding custom claims, you MUST specify one or more destinations.
                 // Read "part 7" for more information about custom claims and scopes.
-                ouathIdentity.AddClaim("username", manager.UserManager.GetUserName(claims),
+                ouathIdentity.AddClaim("username", userManager.GetUserName(claims),
                     OpenIdConnectConstants.Destinations.AccessToken,
                     OpenIdConnectConstants.Destinations.IdentityToken);
                 var customClaim = claims.FindFirstValue("ASOS_Claim");

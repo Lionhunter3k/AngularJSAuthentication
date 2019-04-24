@@ -119,6 +119,7 @@ namespace ASOS.Identity.Api
             });
             services.AddTransient<ICorsPolicyProvider, ClientApplicationCorsPolicyProvider>();
             services.AddScoped<IClientApplicationStore, ClientApplicationStore>();
+
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
         }
 

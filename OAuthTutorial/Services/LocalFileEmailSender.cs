@@ -9,11 +9,11 @@ namespace OAuthTutorial.Services
 {
     // This class is used by the application to send email for account confirmation and password reset.
     // For more details see https://go.microsoft.com/fwlink/?LinkID=532713
-    public class EmailSender : IEmailSender
+    public class LocalFileEmailSender : IEmailSender
     {
         private readonly IHostingEnvironment _hostingEnvironment;
 
-        public EmailSender(IHostingEnvironment hostingEnvironment)
+        public LocalFileEmailSender(IHostingEnvironment hostingEnvironment)
         {
             this._hostingEnvironment = hostingEnvironment;
         }

@@ -32,8 +32,15 @@ namespace OAuthTutorial.Controllers
             return View(await _context.Query<OAuthClient>().Where(x => x.Owner.Id == uid).Fetch(x => x.Owner).ToListAsync());
         }
 
+
+        // GET: OAuthClients/Create
+        public IActionResult Create()
+        {
+            return View();
+        }
+
         // POST: OAuthClients/Create
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
+        // To protect from overposting attacks, please enable the specific properties you want to bind to, for
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -84,6 +91,93 @@ namespace OAuthTutorial.Controllers
             };
 
             return View(vm);
+        }
+
+        // POST: OAuthClients/Edit/5
+        // To protect from overposting attacks, please enable the specific properties you want to bind to, for
+        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(string id, [Bind("ClientDescription", "RedirectUris")] EditClientViewModel vm)
+        {
+            string uid = _userManager.GetUserId(this.User);
+            OAuthClient client = await _context.Query<OAuthClient>().Where(x => x.ClientId == id && x.Owner.Id == uid).Fetch(x => x.Owner).FetchMany(x => x.RedirectURIs).FirstOrDefaultAsync();
+            if (client == null)
+            {
+                return NotFound();
+            }
+
+            if (ModelState.IsValid)
+            {
+                var originalUris = client.RedirectURIs;
+                foreach (string s in vm.RedirectUris)
+                {
+                    if (String.IsNullOrWhiteSpace(s))
+                    {
+                        continue;
+                    }
+                    var fromOld = originalUris.FirstOrDefault(x => x == s);
+                    if (fromOld == null)
+                    {
+                        // this 's' is new.
+                        var rdi = s;
+                        originalUris.Add(rdi);
+                    }
+                }
+
+                // Marking deleted Redirect URIs for Deletion.
+                originalUris.Except(vm.RedirectUris).ToList().Select(x => originalUris.Remove(x));
+
+                client.ClientDescription = vm.ClientDescription;
+                await _context.UpdateAsync(client);
+                await _context.FlushAsync();
+                return RedirectToAction(nameof(Index));
+            }
+            return View(vm);
+        }
+
+        // POST: OAuthClients/Delete/5
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteConfirmed(string id)
+        {
+
+            if (String.IsNullOrEmpty(id))
+            {
+                return NotFound();
+            }
+
+            string uid = _userManager.GetUserId(this.User);
+            var oAuthClient = await _context.Query<OAuthClient>()
+                .SingleOrDefaultAsync(m => m.ClientId == id && m.Owner.Id == uid);
+
+            if (oAuthClient == null)
+            {
+                return NotFound();
+            }
+
+            await _context.DeleteAsync(oAuthClient);
+            await _context.FlushAsync();
+            return RedirectToAction(nameof(Index));
+        }
+
+        // POST: OAuthClients/ResetSecret/
+        [HttpPost, ActionName("ResetSecret")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ResetClientSecret(string id)
+        {
+
+            string uid = _userManager.GetUserId(this.User);
+            OAuthClient client = await _context.Query<OAuthClient>().Where(x => x.ClientId == id && x.Owner.Id == uid).Fetch(x => x.Owner).FirstOrDefaultAsync();
+            if (client == null)
+            {
+                return NotFound();
+            }
+
+            client.ClientSecret = Guid.NewGuid().ToString();
+            await _context.UpdateAsync(client);
+            await _context.FlushAsync();
+            return RedirectToAction(id, "OAuthClients/Edit");
         }
     }
 }
