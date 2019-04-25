@@ -14,17 +14,17 @@ namespace OAuthTutorial.Providers
     {
 
         // These doesn't exist yet - but they will further down.
-        private readonly ValidationService VService;
-        private readonly TokenService TService;
+        private readonly ValidationService _clientValidationService;
+        private readonly TokenService _ticketService;
         private readonly ISession _session;
-        private readonly TicketCounter TicketCounter;
+        private readonly TicketCounter _ticketCounter;
 
         public OAuthProvider(ValidationService vService, TokenService service, ISession session, TicketCounter ticketCounter)
         {
-            VService = vService;
-            TService = service;
+            _clientValidationService = vService;
+            _ticketService = service;
             _session = session;
-            TicketCounter = ticketCounter;
+            _ticketCounter = ticketCounter;
         }
 
         public override Task MatchEndpoint(MatchEndpointContext context)
@@ -78,7 +78,7 @@ namespace OAuthTutorial.Providers
                         );
                 return;
             }
-            else if (!await VService.CheckClientIdIsValidAsync(request.ClientId))
+            else if (!await _clientValidationService.CheckClientIdIsValidAsync(request.ClientId))
             {
                 context.Reject(
                             error: OpenIdConnectConstants.Errors.InvalidClient,
@@ -86,7 +86,7 @@ namespace OAuthTutorial.Providers
                         );
                 return;
             }
-            else if (!await VService.CheckRedirectURIMatchesClientIdAsync(request.ClientId, request.RedirectUri))
+            else if (!await _clientValidationService.CheckRedirectURIMatchesClientIdAsync(request.ClientId, request.RedirectUri))
             {
                 context.Reject(
                             error: OpenIdConnectConstants.Errors.InvalidClient,
@@ -94,7 +94,7 @@ namespace OAuthTutorial.Providers
                         );
                 return;
             }
-            else if (!await VService.CheckScopesAreValidAsync(request.Scope))
+            else if (!await _clientValidationService.CheckScopesAreValidAsync(request.Scope))
             {
                 context.Reject(
                         error: OpenIdConnectConstants.Errors.InvalidRequest,
@@ -133,7 +133,7 @@ namespace OAuthTutorial.Providers
                 return;
             }
 
-            await TService.WriteNewTokenToDatabaseAsync(request.ClientId, access, claimsUser);
+            await _ticketService.WriteNewTokenToDatabaseAsync(request.ClientId, access, claimsUser);
         }
         #endregion
 
@@ -185,7 +185,7 @@ namespace OAuthTutorial.Providers
                           );
                     return;
                 }
-                else if (!await VService.CheckClientIdIsValidAsync(request.ClientId))
+                else if (!await _clientValidationService.CheckClientIdIsValidAsync(request.ClientId))
                 {
                     context.Reject(
                               error: OpenIdConnectConstants.Errors.InvalidClient,
@@ -193,7 +193,7 @@ namespace OAuthTutorial.Providers
                           );
                     return;
                 }
-                else if (!await VService.CheckClientIdAndSecretIsValidAsync(request.ClientId, request.ClientSecret))
+                else if (!await _clientValidationService.CheckClientIdAndSecretIsValidAsync(request.ClientId, request.ClientSecret))
                 {
                     context.Reject(
                               error: OpenIdConnectConstants.Errors.InvalidClient,
@@ -201,7 +201,7 @@ namespace OAuthTutorial.Providers
                           );
                     return;
                 }
-                else if (!await VService.CheckRedirectURIMatchesClientIdAsync(request.ClientId, request.RedirectUri))
+                else if (!await _clientValidationService.CheckRedirectURIMatchesClientIdAsync(request.ClientId, request.RedirectUri))
                 {
                     context.Reject(
                               error: OpenIdConnectConstants.Errors.InvalidClient,
@@ -236,7 +236,7 @@ namespace OAuthTutorial.Providers
                           );
                     return;
                 }
-                else if (!await VService.CheckClientIdIsValidAsync(request.ClientId))
+                else if (!await _clientValidationService.CheckClientIdIsValidAsync(request.ClientId))
                 {
                     context.Reject(
                               error: OpenIdConnectConstants.Errors.InvalidClient,
@@ -244,7 +244,7 @@ namespace OAuthTutorial.Providers
                           );
                     return;
                 }
-                else if (!await VService.CheckClientIdAndSecretIsValidAsync(request.ClientId, request.ClientSecret))
+                else if (!await _clientValidationService.CheckClientIdAndSecretIsValidAsync(request.ClientId, request.ClientSecret))
                 {
                     context.Reject(
                               error: OpenIdConnectConstants.Errors.InvalidClient,
@@ -252,7 +252,7 @@ namespace OAuthTutorial.Providers
                           );
                     return;
                 }
-                else if (!await VService.CheckRefreshTokenIsValidAsync(request.RefreshToken))
+                else if (!await _clientValidationService.CheckRefreshTokenIsValidAsync(request.RefreshToken))
                 {
                     context.Reject(
                               error: OpenIdConnectConstants.Errors.InvalidClient,
@@ -287,7 +287,7 @@ namespace OAuthTutorial.Providers
                           );
                     return;
                 }
-                else if (!await VService.CheckClientIdIsValidAsync(request.ClientId))
+                else if (!await _clientValidationService.CheckClientIdIsValidAsync(request.ClientId))
                 {
                     context.Reject(
                               error: OpenIdConnectConstants.Errors.InvalidClient,
@@ -295,7 +295,7 @@ namespace OAuthTutorial.Providers
                           );
                     return;
                 }
-                else if (!await VService.CheckClientIdAndSecretIsValidAsync(request.ClientId, request.ClientSecret))
+                else if (!await _clientValidationService.CheckClientIdAndSecretIsValidAsync(request.ClientId, request.ClientSecret))
                 {
                     context.Reject(
                               error: OpenIdConnectConstants.Errors.InvalidClient,
@@ -326,7 +326,7 @@ namespace OAuthTutorial.Providers
             {
                 // If we do not specify any form of Ticket, or ClaimsIdentity, or ClaimsPrincipal, our validation will succeed here but fail later.
                 // ASOS needs those to serialize a token, and without any, it fails because there's way to fashion a token properly. Check the ASOS source for more details.
-                ticket = await TicketCounter.MakeClaimsForClientCredentialsAsync(request.ClientId);
+                ticket = await _ticketCounter.MakeClaimsForClientCredentialsAsync(request.ClientId);
                 context.Validate(ticket);
                 return;
             }
@@ -383,7 +383,7 @@ namespace OAuthTutorial.Providers
                         Value = response.AccessToken,
                     };
 
-                    await TService.WriteNewTokenToDatabaseAsync(request.ClientId, t);
+                    await _ticketService.WriteNewTokenToDatabaseAsync(request.ClientId, t);
                 }
                 else if (context.Request.IsAuthorizationCodeGrantType())
                 {
@@ -400,8 +400,8 @@ namespace OAuthTutorial.Providers
                         Value = response.RefreshToken,
                     };
 
-                    await TService.WriteNewTokenToDatabaseAsync(request.ClientId, access, context.Ticket.Principal);
-                    await TService.WriteNewTokenToDatabaseAsync(request.ClientId, refresh, context.Ticket.Principal);
+                    await _ticketService.WriteNewTokenToDatabaseAsync(request.ClientId, access, context.Ticket.Principal);
+                    await _ticketService.WriteNewTokenToDatabaseAsync(request.ClientId, refresh, context.Ticket.Principal);
                 }
                 else if (context.Request.IsRefreshTokenGrantType())
                 {
@@ -411,7 +411,7 @@ namespace OAuthTutorial.Providers
                         GrantType = OpenIdConnectConstants.GrantTypes.AuthorizationCode,
                         Value = response.AccessToken,
                     };
-                    await TService.WriteNewTokenToDatabaseAsync(request.ClientId, access, context.Ticket.Principal);
+                    await _ticketService.WriteNewTokenToDatabaseAsync(request.ClientId, access, context.Ticket.Principal);
                 }
                 await tx.CommitAsync();
             }

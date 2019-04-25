@@ -128,7 +128,7 @@ namespace OAuthTutorial.Controllers
                 }
 
                 // Marking deleted Redirect URIs for Deletion.
-                originalUris.Except(vm.RedirectUris).ToList().Select(x => originalUris.Remove(x));
+                originalUris.Except(vm.RedirectUris).ToList().ForEach(x => originalUris.Remove(x));
 
                 client.ClientDescription = vm.ClientDescription;
                 return RedirectToAction(nameof(Index));

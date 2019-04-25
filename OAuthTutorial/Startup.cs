@@ -93,7 +93,6 @@ namespace OAuthTutorial
             {
                 app.UseBrowserLink();
                 app.UseDeveloperExceptionPage();
-                app.UseDatabaseErrorPage();
             }
             else
             {

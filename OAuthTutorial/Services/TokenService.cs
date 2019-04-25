@@ -35,6 +35,10 @@ namespace OAuthTutorial.Services
             {
                 return;
             }
+            else
+            {
+                token.Client = client;
+            }
 
             // Handling Client Creds
             if (token.GrantType == OpenIdConnectConstants.GrantTypes.ClientCredentials)
@@ -60,6 +64,10 @@ namespace OAuthTutorial.Services
                 if (au == null)
                 {
                     return;
+                }
+                else
+                {
+                    token.User = au;
                 }
 
                 // These tokens also require association to a specific user

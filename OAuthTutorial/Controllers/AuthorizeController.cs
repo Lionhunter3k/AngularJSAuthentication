@@ -18,6 +18,7 @@ using System.Threading.Tasks;
 namespace OAuthTutorial.Controllers
 {
     [Authorize]
+    [Route("/authorize/")]
     public class AuthorizeController : Controller
     {
 
@@ -61,58 +62,68 @@ namespace OAuthTutorial.Controllers
             return LocalRedirect("/");
         }
 
-        private async Task<bool> ValidateRequest(AuthorizeViewModel avm)
+        [HttpPost("accept")]
+        public async Task<IActionResult> Accept()
         {
-            string clientId = avm.ClientId;
-            OAuthClient client = await _session.GetAsync<OAuthClient>(clientId);
+            User au = await _userManager.GetUserAsync(HttpContext.User);
+            if (au == null)
+            {
+                return LocalRedirect("/error");
+            }
+            OpenIdConnectRequest request = HttpContext.GetOpenIdConnectRequest();
+            AuthorizeViewModel avm = await FillFromRequest(request);
+            if (avm == null)
+            {
+                return LocalRedirect("/error");
+            }
+            AuthenticationTicket ticket = await _ticketCounter.MakeClaimsForInteractiveAsync(au, request.ClientId, request.State, request.ResponseType, avm.Scopes, request.RedirectUri);
+            return SignIn(ticket.Principal, ticket.Properties, ticket.AuthenticationScheme);
+        }
+
+        private async Task<AuthorizeViewModel> FillFromRequest(OpenIdConnectRequest OIDCRequest)
+        {
+            string clientId = OIDCRequest.ClientId;
+            var client = await _session.GetAsync<OAuthClient>(clientId);
             if (client == null)
             {
-                return false;
+                return null;
             }
             else
             {
                 // Get the Scopes for this application from the query - disallow duplicates
-                var scopes = new HashSet<OAuthScope>();
-                if (avm.Scopes?.Length > 0)
+                ICollection<OAuthScope> scopes = new HashSet<OAuthScope>();
+                if (!String.IsNullOrWhiteSpace(OIDCRequest.Scope))
                 {
-                    foreach (string s in avm.Scopes)
+                    foreach (string s in OIDCRequest.Scope.Split(' '))
                     {
                         if (OAuthScope.NameInScopes(s))
                         {
                             OAuthScope scope = OAuthScope.GetScope(s);
-                            scopes.Add(scope);
+                            if (!scopes.Contains(scope))
+                            {
+                                scopes.Add(scope);
+                            }
                         }
                         else
                         {
-                            return false;
+                            return null;
                         }
                     }
                 }
-                avm.Scopes = scopes.Select(r => r.Name).ToArray();
-                //Request.QueryString = QueryString.Create(new List<KeyValuePair<string, string>>
-                //{
-                //    new KeyValuePair<string, string>("grant_type", "code"),
-                //    new KeyValuePair<string, string>("client_id", avm.ClientId),
-                //    new KeyValuePair<string, string>("response_type", avm.ResponseType),
-                //    new KeyValuePair<string, string>("scope", string.Join(" ", avm.Scopes)),
-                //    new KeyValuePair<string, string>("redirect_uri", avm.RedirectUri),
-                //    new KeyValuePair<string, string>("state", avm.State)
-                //});
-                return true;
+
+                AuthorizeViewModel avm = new AuthorizeViewModel()
+                {
+                    ClientId = OIDCRequest.ClientId,
+                    ResponseType = OIDCRequest.ResponseType,
+                    State = OIDCRequest.State,
+                    Scopes = String.IsNullOrWhiteSpace(OIDCRequest.Scope) ? new string[0] : OIDCRequest.Scope.Split(' '),
+                    RedirectUri = OIDCRequest.RedirectUri
+                };
+
+                return avm;
             }
         }
 
-        [HttpPost("accept")]
-        public async Task<IActionResult> Accept([FromForm]AuthorizeViewModel avm)
-        {
-            User au = await _userManager.GetUserAsync(HttpContext.User);
-            if (au == null || !await ValidateRequest(avm))
-            {
-                return LocalRedirect("/error");
-            }
-            AuthenticationTicket ticket = await _ticketCounter.MakeClaimsForInteractiveAsync(au, avm.ClientId, avm.State, avm.ResponseType, avm.Scopes, avm.RedirectUri);
-            return SignIn(ticket.Principal, ticket.Properties, ticket.AuthenticationScheme);
-        }
 
     }
 }

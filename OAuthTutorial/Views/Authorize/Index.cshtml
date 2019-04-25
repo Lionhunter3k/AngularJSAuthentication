@@ -33,8 +33,7 @@
 <div class="container">
     <div class="row">
         <div class="col-sm-3">
-            <form method="POST" action="/api/v1/token">
-                <input type="hidden" name="grant_type" value="authorization_code" />
+            <form method="POST" asp-action="accept">
                 <input type="hidden" name="client_id" value="@Model.ClientId" />
                 <input type="hidden" name="response_type" value="@Model.ResponseType" />
                 <input type="hidden" name="scope" value="@string.Join(' ', Model.Scopes)" />
