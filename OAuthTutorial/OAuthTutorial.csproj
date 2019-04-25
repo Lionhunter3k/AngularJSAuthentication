@@ -17,8 +17,13 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Authentication.Api.Infrastructure\Authentication.Api.Infrastructure.csproj" />
     <ProjectReference Include="..\nH.Identity\nH.Identity.csproj" />
     <ProjectReference Include="..\nH.Infrastructure\nH.Infrastructure.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Emails\" />
   </ItemGroup>
 
 </Project>

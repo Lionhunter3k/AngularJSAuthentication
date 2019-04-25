@@ -10,7 +10,7 @@ using NHibernate;
 using NHibernate.Linq;
 using OAuthTutorial.Entities;
 
-namespace OAuthTutorial.Providers
+namespace OAuthTutorial.Services
 {
     public class TokenService
     {

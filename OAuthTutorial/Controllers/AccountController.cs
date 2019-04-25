@@ -11,6 +11,8 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using nH.Identity.Core;
+using nH.Infrastructure;
+using nH.Infrastructure.Filters;
 using OAuthTutorial.Models;
 using OAuthTutorial.Models.AccountViewModels;
 using OAuthTutorial.Services;
@@ -18,6 +20,7 @@ using OAuthTutorial.Services;
 namespace OAuthTutorial.Controllers
 {
     [Authorize]
+    [TypeFilter(typeof(NHibernateSessionFilter<StatefulSessionWrapper>))]
     [Route("[controller]/[action]")]
     public class AccountController : Controller
     {
@@ -221,7 +224,7 @@ namespace OAuthTutorial.Controllers
             ViewData["ReturnUrl"] = returnUrl;
             if (ModelState.IsValid)
             {
-                var user = new User { DisplayName = model.Email, Email = model.Email };
+                var user = new User { DisplayName = model.Email, Email = model.Email, PhoneNumber = model.PhoneNumber };
                 var result = await _userManager.CreateAsync(user, model.Password);
                 if (result.Succeeded)
                 {

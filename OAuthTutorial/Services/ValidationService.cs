@@ -6,7 +6,7 @@ using OAuthTutorial.Services;
 using System;
 using System.Threading.Tasks;
 
-namespace OAuthTutorial.Providers
+namespace OAuthTutorial.Services
 {
     public class ValidationService
     {

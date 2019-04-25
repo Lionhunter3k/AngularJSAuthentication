@@ -2,11 +2,9 @@
 using AspNet.Security.OpenIdConnect.Server;
 using Microsoft.AspNetCore.Authentication;
 using NHibernate;
-using NHibernate.Linq;
 using OAuthTutorial.Entities;
+using OAuthTutorial.Services;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 
@@ -360,58 +358,62 @@ namespace OAuthTutorial.Providers
 
         public override async Task ApplyTokenResponse(ApplyTokenResponseContext context)
         {
-            if (context.Error != null)
+            using (var tx = _session.BeginTransaction())
             {
-                return;
-            }
-            var request = context.Request;
-            var response = context.Response;
-            var client = await _session.GetAsync<OAuthClient>(request.ClientId);
-            if (client == null)
-            {
-                return;
-            }
+                if (context.Error != null)
+                {
+                    return;
+                }
+                var request = context.Request;
+                var response = context.Response;
+                var client = await _session.GetAsync<OAuthClient>(request.ClientId);
+                if (client == null)
+                {
+                    return;
+                }
 
-            // Implicit Flow Tokens are not returned from the `Token` group of methods - you can find them in the `Authorize` group.
-            if (request.IsClientCredentialsGrantType())
-            {
-                // The only thing returned from a successful client grant is a single `Token`
-                var t = new Token
+                // Implicit Flow Tokens are not returned from the `Token` group of methods - you can find them in the `Authorize` group.
+                if (request.IsClientCredentialsGrantType())
                 {
-                    TokenType = OpenIdConnectConstants.TokenUsages.AccessToken,
-                    GrantType = OpenIdConnectConstants.GrantTypes.ClientCredentials,
-                    Value = response.AccessToken,
-                };
+                    // The only thing returned from a successful client grant is a single `Token`
+                    var t = new Token
+                    {
+                        TokenType = OpenIdConnectConstants.TokenUsages.AccessToken,
+                        GrantType = OpenIdConnectConstants.GrantTypes.ClientCredentials,
+                        Value = response.AccessToken,
+                    };
 
-                await TService.WriteNewTokenToDatabaseAsync(request.ClientId, t);
-            }
-            else if (context.Request.IsAuthorizationCodeGrantType())
-            {
-                var access = new Token
+                    await TService.WriteNewTokenToDatabaseAsync(request.ClientId, t);
+                }
+                else if (context.Request.IsAuthorizationCodeGrantType())
                 {
-                    TokenType = OpenIdConnectConstants.TokenUsages.AccessToken,
-                    GrantType = OpenIdConnectConstants.GrantTypes.AuthorizationCode,
-                    Value = response.AccessToken,
-                };
-                var refresh = new Token
-                {
-                    TokenType = OpenIdConnectConstants.TokenUsages.RefreshToken,
-                    GrantType = OpenIdConnectConstants.GrantTypes.AuthorizationCode,
-                    Value = response.RefreshToken,
-                };
+                    var access = new Token
+                    {
+                        TokenType = OpenIdConnectConstants.TokenUsages.AccessToken,
+                        GrantType = OpenIdConnectConstants.GrantTypes.AuthorizationCode,
+                        Value = response.AccessToken,
+                    };
+                    var refresh = new Token
+                    {
+                        TokenType = OpenIdConnectConstants.TokenUsages.RefreshToken,
+                        GrantType = OpenIdConnectConstants.GrantTypes.AuthorizationCode,
+                        Value = response.RefreshToken,
+                    };
 
-                await TService.WriteNewTokenToDatabaseAsync(request.ClientId, access, context.Ticket.Principal);
-                await TService.WriteNewTokenToDatabaseAsync(request.ClientId, refresh, context.Ticket.Principal);
-            }
-            else if (context.Request.IsRefreshTokenGrantType())
-            {
-                Token access = new Token
+                    await TService.WriteNewTokenToDatabaseAsync(request.ClientId, access, context.Ticket.Principal);
+                    await TService.WriteNewTokenToDatabaseAsync(request.ClientId, refresh, context.Ticket.Principal);
+                }
+                else if (context.Request.IsRefreshTokenGrantType())
                 {
-                    TokenType = OpenIdConnectConstants.TokenUsages.AccessToken,
-                    GrantType = OpenIdConnectConstants.GrantTypes.AuthorizationCode,
-                    Value = response.AccessToken,
-                };
-                await TService.WriteNewTokenToDatabaseAsync(request.ClientId, access, context.Ticket.Principal);
+                    Token access = new Token
+                    {
+                        TokenType = OpenIdConnectConstants.TokenUsages.AccessToken,
+                        GrantType = OpenIdConnectConstants.GrantTypes.AuthorizationCode,
+                        Value = response.AccessToken,
+                    };
+                    await TService.WriteNewTokenToDatabaseAsync(request.ClientId, access, context.Ticket.Principal);
+                }
+                await tx.CommitAsync();
             }
         }
         #endregion

@@ -22,7 +22,9 @@ namespace nH.Infrastructure.Container
                              .AddSingleton(GetSessionFactory)
                              .AddSingleton(GetModelMapper)
                              .AddScoped((ctx) => ctx.GetRequiredService<ISessionFactory>().OpenSession())
-                             .AddScoped((ctx) => ctx.GetRequiredService<ISessionFactory>().OpenStatelessSession());
+                             .AddScoped((ctx) => ctx.GetRequiredService<ISessionFactory>().OpenStatelessSession())
+                             .AddScoped<StatefulSessionWrapper>()
+                             .AddScoped<StatelessSessionWrapper>();
         }
 
         public IServiceCollection ServiceCollection { get; }

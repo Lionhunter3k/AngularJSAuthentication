@@ -20,7 +20,12 @@ namespace OAuthTutorial.Services
 
         public async Task SendEmailAsync(string email, string subject, string message)
         {
-            await File.WriteAllTextAsync(Path.Combine(_hostingEnvironment.ContentRootPath, "Emails", email, subject + ".html"), message);
+            var folderPath = Path.Combine(_hostingEnvironment.ContentRootPath, "Emails", email);
+            if(!Directory.Exists(folderPath))
+            {
+                Directory.CreateDirectory(folderPath);
+            }
+            await File.WriteAllTextAsync(Path.Combine(folderPath, DateTime.UtcNow.Ticks + "_" + subject + ".html"), message);
         }
     }
 }

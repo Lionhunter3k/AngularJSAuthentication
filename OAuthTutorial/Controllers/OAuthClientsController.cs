@@ -10,10 +10,13 @@ using System.Linq;
 using System.Threading.Tasks;
 using NHibernate.Linq;
 using OAuthTutorial.Models.OAuthClientsViewModels;
+using nH.Infrastructure.Filters;
+using nH.Infrastructure;
 
 namespace OAuthTutorial.Controllers
 {
     [Authorize]
+    [TypeFilter(typeof(NHibernateSessionFilter<StatefulSessionWrapper>))]
     public class OAuthClientsController : Controller
     {
         private readonly ISession _context;
@@ -59,7 +62,6 @@ namespace OAuthTutorial.Controllers
                 };
 
                 await _context.SaveAsync(client);
-                await _context.FlushAsync();
                 return RedirectToAction(nameof(Index));
             }
             return View(vm);
@@ -129,8 +131,6 @@ namespace OAuthTutorial.Controllers
                 originalUris.Except(vm.RedirectUris).ToList().Select(x => originalUris.Remove(x));
 
                 client.ClientDescription = vm.ClientDescription;
-                await _context.UpdateAsync(client);
-                await _context.FlushAsync();
                 return RedirectToAction(nameof(Index));
             }
             return View(vm);
@@ -157,7 +157,6 @@ namespace OAuthTutorial.Controllers
             }
 
             await _context.DeleteAsync(oAuthClient);
-            await _context.FlushAsync();
             return RedirectToAction(nameof(Index));
         }
 
@@ -175,9 +174,7 @@ namespace OAuthTutorial.Controllers
             }
 
             client.ClientSecret = Guid.NewGuid().ToString();
-            await _context.UpdateAsync(client);
-            await _context.FlushAsync();
-            return RedirectToAction(id, "OAuthClients/Edit");
+            return RedirectToAction("Edit", new { id });
         }
     }
 }

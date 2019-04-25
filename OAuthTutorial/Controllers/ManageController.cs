@@ -11,6 +11,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using nH.Identity.Core;
+using nH.Infrastructure;
+using nH.Infrastructure.Filters;
 using OAuthTutorial.Models;
 using OAuthTutorial.Models.ManageViewModels;
 using OAuthTutorial.Services;
@@ -18,6 +20,7 @@ using OAuthTutorial.Services;
 namespace OAuthTutorial.Controllers
 {
     [Authorize]
+    [TypeFilter(typeof(NHibernateSessionFilter<StatefulSessionWrapper>))]
     [Route("[controller]/[action]")]
     public class ManageController : Controller
     {

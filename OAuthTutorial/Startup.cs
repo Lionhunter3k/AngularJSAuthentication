@@ -15,6 +15,8 @@ using System.IO;
 using OAuthTutorial.Entities.Mappings;
 using System;
 using OAuthTutorial.Providers;
+using Microsoft.AspNetCore.Authorization;
+using OAuthTutorial.Policies;
 
 namespace OAuthTutorial
 {
@@ -43,7 +45,7 @@ namespace OAuthTutorial
                     var schemaExport = new SchemaExport(cfg);
                     schemaExport
                     .SetOutputFile(Path.Combine(HostingEnvironment.ContentRootPath, "schema.sql"))
-                    .Execute(true, true, false);
+                    .Execute(true, false, false);
                 });
 
             services.AddIdentity<User, Role>((x) => {
@@ -58,6 +60,7 @@ namespace OAuthTutorial
               .AddDefaultTokenProviders();
 
             services.AddAuthentication()
+                       .AddOAuthValidation()
                        .AddOpenIdConnectServer(options => {
                            options.UserinfoEndpointPath = "/api/v1/me";
                            options.TokenEndpointPath = "/api/v1/token";
@@ -77,6 +80,9 @@ namespace OAuthTutorial
             services.AddScoped<OAuthProvider>();
             services.AddScoped<ValidationService>();
             services.AddScoped<TokenService>();
+            services.AddScoped<TicketCounter>();
+            services.AddSingleton<IAuthorizationPolicyProvider, AuthorizationPolicyProvider>();
+            services.AddSingleton<IAuthorizationHandler, HasScopeHandler>();
             services.AddMvc();
         }
 
